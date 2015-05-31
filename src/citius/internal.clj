@@ -49,7 +49,9 @@
   []
   (if (contains? *options* :quick?)
     (get *options* :quick?)
-    true))
+    (if-let [^String quick-bench (System/getProperty "citius.bench.quick")]
+      (Boolean/parseBoolean quick-bench)
+      true)))
 
 
 (def time-unit-factors

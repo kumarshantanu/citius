@@ -19,7 +19,7 @@
                     :micros, :millis, :seconds
   :colorize?        true or false                 true
   :criterium-output :tabular or true or false    :tabular
-  :quick?           true/false         true      :true
+  :quick?           true/false         true      :true (can be set via system property 'citius.bench.quick')
   Example:
   (clojure.test/use-fixtures :once
     (make-bench-wrapper [\"pig\" \"horse\" \"cheetah\"] {:chart-title \"Animals\"
@@ -51,7 +51,8 @@
                   (map #(assoc %2 :name %1) i/*labels*)
                   vec))
             (b/make-category-dataset {:group-key :name})
-            (b/make-bar-chart-3d (str chart-title " benchmark statistics (lower is better)")
+            (b/make-bar-chart-3d (format "%s %s statistics (lower is better)"
+                                   chart-title (if (i/option-quick?) "quick-benchmark" "benchmark"))
               {:category-title "Test cases"
                :value-title (let [[_ unit] (i/time-factor chart-time-unit)]
                               (format "Latency in %s (lower is better)" unit))})

@@ -38,6 +38,13 @@
     true))
 
 
+(defn option-criterium-output
+  []
+  (if (contains? *options* :criterium-output)
+    (:criterium-output *options*)
+    :tabular))
+
+
 (defn option-quick?
   []
   (if (contains? *options* :quick?)

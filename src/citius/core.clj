@@ -74,12 +74,19 @@
                                   (map exprs)
                                   vec)]
        ;; print comparative tabular report
-       (->> result-and-reports#
-         (map second)  ; get Criterium reports
-         (map s/split-lines)
-         (apply map (fn [& lines#] (->> (map s/trim lines#)
-                                     (zipmap i/*labels*))))
-         (pp/print-table i/*labels*))
+       (let [criterium-output# (i/option-criterium-output)]
+         (cond
+           (= criterium-output#
+             :tabular)          (->> result-and-reports#
+                                  (map second)  ; get Criterium reports
+                                  (map s/split-lines)
+                                  (apply map (fn [& lines#] (->> (map s/trim lines#)
+                                                              (zipmap i/*labels*))))
+                                  (pp/print-table i/*labels*))
+           criterium-output#    (->> result-and-reports#
+                                  (map second)
+                                  (map #(i/echo "----- " %1 " -----\n" %2) i/*labels*)
+                                  dorun)))
        ;; print summary report
        (->> result-and-reports#
          (map first)  ; get Criterium result data

@@ -88,7 +88,7 @@
 (defmacro measure
   [expr]
   `(do
-     (echo "::::: Benchmarking" ~(pr-str expr))
+     (echo ":::::" (if (option-quick?) "Quick-benchmarking" "Benchmarking") ~(pr-str expr))
      (let [result# (if (option-quick?)
                      (c/quick-benchmark ~expr {})
                      (c/benchmark ~expr {}))]

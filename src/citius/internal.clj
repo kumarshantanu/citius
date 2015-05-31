@@ -35,7 +35,11 @@
   []
   (if (contains? *options* :colorize?)
     (get *options* :colorize?)
-    true))
+    (if-let [^String colorize-prop (System/getProperty "citius_colorize")]
+      (Boolean/parseBoolean colorize-prop)
+      (if-let [^String colorize-env (System/getenv "CITIUS_COLORIZE")]
+        (Boolean/parseBoolean colorize-env)
+        true))))
 
 
 (defn option-criterium-output
@@ -45,13 +49,15 @@
     :tabular))
 
 
-(defn option-quick?
+(defn option-quick-bench?
   []
   (if (contains? *options* :quick?)
     (get *options* :quick?)
-    (if-let [^String quick-bench (System/getProperty "citius.bench.quick")]
-      (Boolean/parseBoolean quick-bench)
-      true)))
+    (if-let [^String quick-bench-prop (System/getProperty "citius_quick_bench")]
+      (Boolean/parseBoolean quick-bench-prop)
+      (if-let [^String quick-bench-env (System/getenv "CITIUS_QUICK_BENCH")]
+        (Boolean/parseBoolean quick-bench-env)
+        false))))
 
 
 (def time-unit-factors
@@ -90,8 +96,8 @@
 (defmacro measure
   [expr]
   `(do
-     (echo ":::::" (if (option-quick?) "Quick-benchmarking" "Benchmarking") ~(pr-str expr))
-     (let [result# (if (option-quick?)
+     (echo ":::::" (if (option-quick-bench?) "Quick-benchmarking" "Benchmarking") ~(pr-str expr))
+     (let [result# (if (option-quick-bench?)
                      (c/quick-benchmark ~expr {})
                      (c/benchmark ~expr {}))]
        [result# (with-out-str (c/report-result result#))])))

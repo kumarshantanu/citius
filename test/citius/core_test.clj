@@ -6,8 +6,7 @@
 
 
 (use-fixtures :once (c/make-bench-wrapper ["pig" "horse" "cheetah"] {:chart-title "Animals"
-                                                                     :chart-filename "bench-animals.png"
-                                                                     :quick? true}))
+                                                                     :chart-filename "bench-animals.png"}))
 
 
 (deftest test-string

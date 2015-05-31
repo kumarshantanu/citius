@@ -9,22 +9,22 @@
 
 (defn make-bench-wrapper
   "Given a vector of unique labels and options, return an arity-1 fn that accepts an arity-0 fn and executes it in the
-  context of the labels and options.
-  Option            Type                         Default
+  context of the labels and options - few options may be overridden via system property or environment variable.
+  Option            Type                         Default      System property     Environment variable
   :chart-title      stringable                   \"Latency\"
   :chart-filename   bar-chart image filename
   :chart-width      natural number                1280
   :chart-height     natural number                 800
   :chart-time-unit  Either of :minutes, :nanos,  :nanos
                     :micros, :millis, :seconds
-  :colorize?        true or false                 true
+  :colorize?        true or false                 true        citius_colorize     CITIUS_COLORIZE
   :criterium-output :tabular or true or false    :tabular
-  :quick?           true/false         true      :true (can be set via system property 'citius.bench.quick')
+  :quick-bench?     true or false                 true        citius_quick_bench  CITIUS_QUICK_BENCH
   Example:
   (clojure.test/use-fixtures :once
     (make-bench-wrapper [\"pig\" \"horse\" \"cheetah\"] {:chart-title \"Animals\"
                                                          :chart-filename \"bench-animals.png\"
-                                                         :quick? true}))"
+                                                         :quick-bench? true}))"
   [labels options]
   (when-not (vector? labels)
     (throw (IllegalArgumentException.
@@ -52,7 +52,7 @@
                   vec))
             (b/make-category-dataset {:group-key :name})
             (b/make-bar-chart-3d (format "%s %s statistics (lower is better)"
-                                   chart-title (if (i/option-quick?) "quick-benchmark" "benchmark"))
+                                   chart-title (if (i/option-quick-bench?) "quick-benchmark" "benchmark"))
               {:category-title "Test cases"
                :value-title (let [[_ unit] (i/time-factor chart-time-unit)]
                               (format "Latency in %s (lower is better)" unit))})

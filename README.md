@@ -38,9 +38,9 @@ Under each test, conduct the comparative benchmarking:
 Outside of clojure.test, use the `with-bench-context` macro:
 
 ```clojure
-(c/with-bench-context
-  ["Apply" "Reduce"] {:chart-title "Apply vs Reduce"
-                      :chart-filename (format "bench-simple-clj-%s.png" c/clojure-version-str)}
+(c/with-bench-context ["Apply" "Reduce"]
+  {:chart-title "Apply vs Reduce"
+   :chart-filename (format "bench-simple-clj-%s.png" c/clojure-version-str)}
   (c/compare-perf
     "concat strs" (apply str ["foo" "bar" "baz"]) (reduce str ["foo" "bar" "baz"]))
   (c/compare-perf

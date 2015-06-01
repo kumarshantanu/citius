@@ -7,6 +7,12 @@
     [citius.internal   :as i]))
 
 
+(def ^String clojure-version-str (->> [:major :minor :incremental :qualifier]
+                                   (map *clojure-version*)
+                                   (keep identity)
+                                   (s/join \.)))
+
+
 (defn make-bench-wrapper
   "Given a vector of unique labels and options, return an arity-1 fn that accepts an arity-0 fn and executes it in the
   context of the labels and options - few options may be overridden via system property or environment variable.

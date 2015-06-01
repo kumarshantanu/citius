@@ -5,8 +5,9 @@
     [citius.core :as c]))
 
 
-(use-fixtures :once (c/make-bench-wrapper ["pig" "horse" "cheetah"] {:chart-title "Animals"
-                                                                     :chart-filename "bench-animals.png"}))
+(use-fixtures :once (c/make-bench-wrapper ["pig" "horse" "cheetah"]
+                      {:chart-title "Animals"
+                       :chart-filename (format "target/bench-animals-clj-%s.png" c/clojure-version-str)}))
 
 
 (deftest test-string

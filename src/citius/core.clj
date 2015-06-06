@@ -16,16 +16,16 @@
 (defn make-bench-wrapper
   "Given a vector of unique labels and options, return an arity-1 fn that accepts an arity-0 fn and executes it in the
   context of the labels and options - few options may be overridden via system property or environment variable.
-  Option            Type                         Default      System property     Environment variable
+  Option            Type                         Default      System property         Environment variable
   :chart-title      stringable                   \"Latency\"
   :chart-filename   bar-chart image filename
   :chart-width      natural number                1280
   :chart-height     natural number                 800
   :chart-time-unit  Either of :minutes, :nanos,  :nanos
                     :micros, :millis, :seconds
-  :colorize?        true or false                 true        citius_colorize     CITIUS_COLORIZE
-  :criterium-output :tabular or true or false    :tabular
-  :quick-bench?     true or false                 true        citius_quick_bench  CITIUS_QUICK_BENCH
+  :colorize?        true or false                 true        citius_colorize         CITIUS_COLORIZE
+  :criterium-output :tabular or true or false    :tabular     citius_criterium_output CITIUS_CRITERIUM_OUTPUT
+  :quick-bench?     true or false                 true        citius_quick_bench      CITIUS_QUICK_BENCH
   Example:
   (clojure.test/use-fixtures :once
     (make-bench-wrapper [\"pig\" \"horse\" \"cheetah\"] {:chart-title \"Animals\"

@@ -3,9 +3,10 @@
 A Clojure library for comparative benchmarking using
 [Criterium](https://github.com/hugoduncan/criterium).
 
+
 ## Usage
 
-Leiningen dependency: `[citius "0.1.0"]`
+Leiningen dependency: `[citius "0.1.1-SNAPSHOT"]`
 
 Requiring namespace:
 ```clojure
@@ -46,6 +47,33 @@ Outside of clojure.test, use the `with-bench-context` macro:
   (c/compare-perf
     "sum numbers" (apply + [1 2 3 4 5 6 7 8 9 0]) (reduce + [1 2 3 4 5 6 7 8 9 0])))
 ```
+
+### Controlling runtime behavior
+
+You may tweak the runtime behavior of benchmarking with the following system properties and environment variables:
+
+| Description              | Choices           | Default value | Java system property      | Environment variable      |
+|--------------------------|-------------------|---------------|---------------------------|---------------------------|
+| Colorize summary output? | `true` or `false` |    `true`     | `citius_colorize`         | `CITIUS_COLORIZE`         |
+| Criterium output format  | `true` or `false` |  `:tabular`   | `citius_criterium_output` | `CITIUS_CRITERIUM_OUTPUT` |
+| Perform quick bench?     | `true` or `false` |    `true`     | `citius_quick_bench`      | `CITIUS_QUICK_BENCH`      |
+
+For example, if the tabular Criterium output exceeds the width of your screen you may want to view it vertically:
+
+On Unix-like systems:
+```bash
+CITIUS_CRITERIUM_OUTPUT=true lein with-profile clj17,bench test
+# or
+export CITIUS_CRITERIUM_OUTPUT=true
+lein with-profile clj17,bench test
+```
+
+On Windows:
+```batch
+set CITIUS_CRITERIUM_OUTPUT=true
+lein with-profile clj17,bench test
+```
+
 
 ## License
 

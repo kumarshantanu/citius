@@ -46,7 +46,11 @@
   []
   (if (contains? *options* :criterium-output)
     (:criterium-output *options*)
-    :tabular))
+    (if-let [^String criterium-output-prop (System/getProperty "citius_criterium_output")]
+      (Boolean/parseBoolean criterium-output-prop)
+      (if-let [^String criterium-output-env (System/getenv "CITIUS_CRITERIUM_OUTPUT")]
+        (Boolean/parseBoolean criterium-output-env)
+        :tabular))))
 
 
 (defn option-quick-bench?

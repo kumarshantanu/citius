@@ -6,7 +6,7 @@ A Clojure library for comparative benchmarking using
 
 ## Usage
 
-Leiningen dependency: `[citius "0.1.1-SNAPSHOT"]`
+Leiningen dependency: `[citius "0.1.1"]`
 
 Requiring namespace:
 ```clojure

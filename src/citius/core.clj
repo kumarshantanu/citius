@@ -68,7 +68,7 @@
 
 (defmacro with-bench-context
   [labels options & body]
-  `((make-bench-test-wrapper ~labels ~options) (fn [] ~@body)))
+  `((make-bench-wrapper ~labels ~options) (fn [] ~@body)))
 
 
 (defmacro compare-perf

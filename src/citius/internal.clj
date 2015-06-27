@@ -143,18 +143,17 @@
                           (vector? coll) (vec x)
                           (set? coll)    (set x)
                           :otherwise     (list* x)))
-        as-number (fn [x] (condp = (class v)
-                            Short   (short x)
-                            Integer (int x)
-                            Long    (long x)
-                            Float   (float x)
-                            Double  (double x)
-                            (unexpected "Integer, Long, Float or Double" x)))]
+        average (fn [x] (condp = (class v)
+                          Short   (short  (/ ^short  x n))
+                          Integer (int    (/ ^int    x n))
+                          Long    (long   (/ ^long   x n))
+                          Float   (float  (/ ^float  x n))
+                          Double  (double (/ ^double x n))
+                          (unexpected "Integer, Long, Float or Double" x)))]
     (cond
       (apply = coll) v
       (number? v) (-> (apply + coll)
-                    (/ n)
-                    as-number)
+                    average)
       (string? v) (if (apply = coll)
                     v
                     (s/join ", " coll))

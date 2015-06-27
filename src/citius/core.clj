@@ -67,6 +67,8 @@
 
 
 (defmacro with-bench-context
+  "Evaluate body of code in a benchmark context.
+  See: make-bench-wrapper"
   [labels options & body]
   `((make-bench-wrapper ~labels ~options) (fn [] ~@body)))
 

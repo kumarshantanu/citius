@@ -1,6 +1,11 @@
 ## Changes and TODO
 
 
+## 2015-June-27 / 0.1.2
+
+* Fix typo in `make-bench-wrapper` call
+
+
 ## 2015-June-06 / 0.1.1
 
 * Criterium output format - can override at runtime

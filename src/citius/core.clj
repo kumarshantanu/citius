@@ -23,6 +23,7 @@
   :chart-height     natural number                 800
   :chart-time-unit  Either of :minutes, :nanos,  :nanos
                     :micros, :millis, :seconds
+  :concurrency      list of ints (for each expr)              citius_concurrency      CITIUS_CONCURRENCY (comma delimit)
   :colorize?        true or false                 true        citius_colorize         CITIUS_COLORIZE
   :criterium-output :tabular or true or false    :tabular     citius_criterium_output CITIUS_CRITERIUM_OUTPUT
   :quick-bench?     true or false                 true        citius_quick_bench      CITIUS_QUICK_BENCH
@@ -78,9 +79,9 @@
   [bench-name & exprs]
   `(do
      (i/echo "========== " ~bench-name " ==========")
-     (let [result-and-reports# ~(-> (fn [expr]
-                                      `(i/measure ~expr))
-                                  (map exprs)
+     (let [result-and-reports# ~(-> (fn [index expr]
+                                      `(i/measure ~index ~expr))
+                                  (map-indexed exprs)
                                   vec)]
        ;; print comparative tabular report
        (let [criterium-output# (i/option-criterium-output)]

@@ -1,8 +1,11 @@
 (ns citius.internal
   (:require
+    [clojure.set    :as t]
     [clojure.string :as s]
     [clansi.core    :as a]
-    [criterium.core :as c]))
+    [criterium.core :as c])
+  (:import
+    [java.util.concurrent Callable Executors ExecutorService Future]))
 
 
 ;; ----- reporting and error reporting -----
@@ -64,6 +67,21 @@
         false))))
 
 
+(defn option-concurrency
+  []
+  (if (contains? *options* :concurrency)
+    (get *options* :concurrency)
+    (if-let [^String concurrency-prop (System/getProperty "citius_concurrency")]
+      (->> (s/split concurrency-prop #",")
+        (mapv s/trim)
+        (mapv #(Integer/parseInt ^String %)))
+      (if-let [^String concurrency-env (System/getenv "CITIUS_CONCURRENCY")]
+        (->> (s/split concurrency-env #",")
+          (mapv s/trim)
+          (mapv #(Integer/parseInt ^String %)))
+        (repeat 1)))))
+
+
 (def time-unit-factors
   {:minutes [(/ 60) "minutes"]
    :nanos   [1e9 "nano seconds"]
@@ -97,23 +115,88 @@
      (swap! *bar-chart-data* conj))))
 
 
+(defn concurrently
+  "Given a function of no args, presumably with side effects, execute it concurrently in n threads returning a vector
+  of results."
+  [n f]
+  (let [^ExecutorService thread-pool (Executors/newFixedThreadPool n)
+        future-vals (transient [])]
+    (dotimes [_ n]
+      (let [^Future each-future (.submit thread-pool ^Callable f)]
+        (conj! future-vals each-future)))
+    (try
+      (->> (persistent! future-vals)
+        (mapv deref))
+      (finally
+        (.shutdown thread-pool)))))
+
+
+(defn cr-merge
+  "Merge Criterium benchmark results."
+  [coll] ; (doseq [each coll] (println each)) ; uncomment for debugging
+  (when-not (->> (map class coll)
+              (apply =))
+    (unexpected "all values of the same type" coll))
+  (let [v (first coll)
+        n (count coll)
+        as-coll (fn [x] (cond
+                          (vector? coll) (vec x)
+                          (set? coll)    (set x)
+                          :otherwise     (list* x)))
+        as-number (fn [x] (condp = (class v)
+                            Short   (short x)
+                            Integer (int x)
+                            Long    (long x)
+                            Float   (float x)
+                            Double  (double x)
+                            (unexpected "Integer, Long, Float or Double" x)))]
+    (cond
+      (apply = coll) v
+      (number? v) (-> (apply + coll)
+                    (/ n)
+                    as-number)
+      (string? v) (if (apply = coll)
+                    v
+                    (s/join ", " coll))
+      (map? v)    (let [ks (->> (map keys coll)
+                             (map set)
+                             (apply t/union))]
+                    (->> (map (fn [k]
+                                {k (->> (map #(get % k) coll)
+                                     vec
+                                     cr-merge)}) ks)
+                      (apply merge)))
+      (coll? v)   (->> (apply map vector coll)
+                    (map cr-merge)
+                    as-coll)
+      :otherwise  (unexpected "number, string, map or collection" v))))
+
+
 (defmacro measure
-  [expr]
-  `(do
-     (echo ":::::" (if (option-quick-bench?) "Quick-benchmarking" "Benchmarking") ~(pr-str expr))
-     (let [result# (if (option-quick-bench?)
-                     (c/quick-benchmark ~expr {})
-                     (c/benchmark ~expr {}))]
-       [result# (with-out-str (c/report-result result#))])))
+  "Benchmark expression latency"
+  [index expr]
+  `(let [concurrency# (nth (option-concurrency) ~index 1)
+         benchmark-f# (fn []
+                        (if (option-quick-bench?)
+                          (c/quick-benchmark ~expr {})
+                          (c/benchmark ~expr {})))
+         dummy#  (echo ":::::" (if (option-quick-bench?) "Quick-benchmarking" "Benchmarking")
+                   (str \' (nth *labels* ~index) \') \- ~(pr-str expr) "::::: Concurrency:" concurrency#)
+         result# (if (= 1 concurrency#)
+                   (benchmark-f#)
+                   (cr-merge (concurrently concurrency# benchmark-f#)))]
+     [result# (with-out-str (c/report-result result#))]))
 
 
 (defn nix?
+  "Return true if a Unix-like system detected, false other."
   []
   (let [os (s/lower-case (str (System/getProperty "os.name")))]
     (some #(>= (.indexOf os ^String %) 0) ["mac" "linux" "unix"])))
 
 
 (defn colorize
+  "Colorize text"
   [text & args]
   (if (and (option-colorize?) (nix?))
     (apply a/style text args)
@@ -121,6 +204,7 @@
 
 
 (defn comparison-summary
+  "Return comparative benchmark summary text"
   [& bench-results]
   (cond
     (empty? bench-results)   (colorize "No benchmark results found." :grey :bg-black)

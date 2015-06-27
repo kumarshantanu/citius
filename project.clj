@@ -1,4 +1,4 @@
-(defproject citius "0.1.2"
+(defproject citius "0.2.0"
   :description "Comparative benchmarking using Criterium"
   :url "https://github.com/kumarshantanu/citius"
   :license {:name "Eclipse Public License"
@@ -10,7 +10,7 @@
                 *assert* true}
   :jvm-opts ^:replace ["-server" "-Xms2048m" "-Xmx2048m"]
   :profiles {:c16 {:dependencies [[org.clojure/clojure "1.6.0"]]}
-             :c17 {:dependencies [[org.clojure/clojure "1.7.0-RC1"]]
+             :c17 {:dependencies [[org.clojure/clojure "1.7.0-RC2"]]
                    :global-vars {*unchecked-math* :warn-on-boxed}}
              :dev {:dependencies [[org.clojure/tools.nrepl "0.2.10"]]}
              :pro {:global-vars {*assert* false}}})

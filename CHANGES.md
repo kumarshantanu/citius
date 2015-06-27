@@ -1,6 +1,11 @@
 ## Changes and TODO
 
 
+## 2015-June-27 / 0.2.0
+
+* Support benchmarking with tunable concurrency - can override at runtime
+
+
 ## 2015-June-27 / 0.1.2
 
 * Fix typo in `make-bench-wrapper` call

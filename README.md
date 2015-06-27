@@ -6,7 +6,7 @@ A Clojure library for comparative benchmarking using
 
 ## Usage
 
-Leiningen dependency: `[citius "0.1.2"]`
+Leiningen dependency: `[citius "0.2.0"]`
 
 Requiring namespace:
 ```clojure
@@ -52,11 +52,12 @@ Outside of clojure.test, use the `with-bench-context` macro:
 
 You may tweak the runtime behavior of benchmarking with the following system properties and environment variables:
 
-| Description              | Choices           | Default value | Java system property      | Environment variable      |
-|--------------------------|-------------------|---------------|---------------------------|---------------------------|
-| Colorize summary output? | `true` or `false` |    `true`     | `citius_colorize`         | `CITIUS_COLORIZE`         |
-| Criterium output format  | `true` or `false` |  `:tabular`   | `citius_criterium_output` | `CITIUS_CRITERIUM_OUTPUT` |
-| Perform quick bench?     | `true` or `false` |    `true`     | `citius_quick_bench`      | `CITIUS_QUICK_BENCH`      |
+| Description              | Choices              | Default    | Java system property      | Environment variable      |
+|--------------------------|----------------------|------------|---------------------------|---------------------------|
+| Benchmark concurrency    | comma delimited ints | 1 for each | `citius_concurrency`      | `CITIUS_CONCURRENCY`      |
+| Colorize summary output? | `true` or `false`    |    `true`  | `citius_colorize`         | `CITIUS_COLORIZE`         |
+| Criterium output format  | `true` or `false`    | `:tabular` | `citius_criterium_output` | `CITIUS_CRITERIUM_OUTPUT` |
+| Perform quick bench?     | `true` or `false`    |    `true`  | `citius_quick_bench`      | `CITIUS_QUICK_BENCH`      |
 
 For example, if the tabular Criterium output exceeds the width of your screen you may want to view it vertically:
 

@@ -189,7 +189,8 @@
                             (finally
                               (.setName (Thread/currentThread) thread-name#)))))
          dummy#  (echo ":::::" (if (option-quick-bench?) "Quick-benchmarking" "Benchmarking")
-                   (str \' (nth *labels* ~index) \') \- ~(pr-str expr) "::::: Concurrency:" concurrency#)
+                   (str \' (nth *labels* ~index) "'::'" ~bench-name "':") ~(pr-str expr)
+                   "::::: Concurrency:" concurrency#)
          result# (if (= 1 concurrency#)
                    (benchmark-f#)
                    (cr-merge (concurrently concurrency# benchmark-f#)))]

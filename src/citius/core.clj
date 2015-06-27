@@ -80,7 +80,7 @@
   `(do
      (i/echo "========== " ~bench-name " ==========")
      (let [result-and-reports# ~(-> (fn [index expr]
-                                      `(i/measure ~index ~expr))
+                                      `(i/measure ~bench-name ~index ~expr))
                                   (map-indexed exprs)
                                   vec)]
        ;; print comparative tabular report

@@ -173,12 +173,21 @@
 
 (defmacro measure
   "Benchmark expression latency"
-  [index expr]
+  [bench-name index expr]
   `(let [concurrency# (nth (option-concurrency) ~index 1)
+         next-number# (let [counter# (atom 0)]
+                        (fn [] (swap! counter# inc)))
+         index-label# (nth *labels* ~index)
          benchmark-f# (fn []
-                        (if (option-quick-bench?)
-                          (c/quick-benchmark ~expr {})
-                          (c/benchmark ~expr {})))
+                        (let [thread-name# (.getName (Thread/currentThread))]
+                          (try
+                            (.setName (Thread/currentThread)
+                              (str "citius-" index-label# \- ~bench-name \- (next-number#)))
+                            (if (option-quick-bench?)
+                              (c/quick-benchmark ~expr {})
+                              (c/benchmark ~expr {}))
+                            (finally
+                              (.setName (Thread/currentThread) thread-name#)))))
          dummy#  (echo ":::::" (if (option-quick-bench?) "Quick-benchmarking" "Benchmarking")
                    (str \' (nth *labels* ~index) \') \- ~(pr-str expr) "::::: Concurrency:" concurrency#)
          result# (if (= 1 concurrency#)

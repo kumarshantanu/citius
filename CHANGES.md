@@ -1,6 +1,15 @@
 ## Changes and TODO
 
 
+## 2015-June-29 / 0.2.1
+
+* Show extrapolated throughput in comparative benchmark output
+* Fix reflection warning
+* Set thread name as citius-{label}-{testcase}-{N} when benchmarking
+* Fix formatting for the benchmarking notice
+* Fix message/color for single benchmark summary
+
+
 ## 2015-June-27 / 0.2.0
 
 * Support benchmarking with tunable concurrency - can override at runtime

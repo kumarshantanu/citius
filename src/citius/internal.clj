@@ -196,7 +196,10 @@
          result# (if (= 1 concurrency#)
                    (benchmark-f#)
                    (cr-merge (concurrently concurrency# benchmark-f#)))]
-     [result# (with-out-str (c/report-result result#))]))
+     [result# (str "Extrapolated throughput: "
+                (long (/ 1 (double (first (:mean result#)))))
+                "/sec/thread\n"
+                (with-out-str (c/report-result result#)))]))
 
 
 (defn nix?

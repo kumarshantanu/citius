@@ -116,19 +116,21 @@
 
 
 (defn concurrently
-  "Given a function of no args, presumably with side effects, execute it concurrently in n threads returning a vector
-  of results."
-  [n f]
-  (let [^ExecutorService thread-pool (Executors/newFixedThreadPool n)
-        future-vals (transient [])]
-    (dotimes [_ n]
-      (let [^Future each-future (.submit thread-pool ^Callable f)]
-        (conj! future-vals each-future)))
-    (try
-      (->> (persistent! future-vals)
-        (mapv deref))
-      (finally
-        (.shutdown thread-pool)))))
+  "Given a function f of no args, presumably with side effects, execute it concurrently in n threads returning a vector
+  of results. When specified, function g handles the java.util.concurrent.Future objects."
+  ([n f]
+    (concurrently n f #(mapv deref %)))
+  ([n f g]
+    (let [^ExecutorService thread-pool (Executors/newFixedThreadPool n)
+          future-vals (transient [])]
+      (dotimes [i n]
+        (let [^Callable task (if (coll? f) (nth f i) f)
+              ^Future each-future (.submit thread-pool task)]
+          (conj! future-vals each-future)))
+      (try
+        (g (persistent! future-vals))
+        (finally
+          (.shutdown thread-pool))))))
 
 
 (defn cr-merge
@@ -216,9 +218,9 @@
   "Return comparative benchmark summary text"
   [& bench-results]
   (cond
-    (empty? bench-results)   (colorize "No benchmark results found." :grey :bg-black)
+    (empty? bench-results)   (colorize "No benchmark results found." :black :bg-yellow)
     (= 1
-      (count bench-results)) (colorize "Only one benchmark result found." :grey :bg-black)
+      (count bench-results)) (colorize "Only one benchmark result found - comparison not possible." :black :bg-yellow)
     :otherwise               ;; find max (mx) and min (mn)
                              (let [{:keys [^double mx ^long ix
                                            ^double mn ^long in]} (->> bench-results
@@ -261,3 +263,102 @@
                                                            :bg-yellow))))
                                  (interpose ", ")
                                  (apply str)))))
+
+
+;; ----- call stats helpers -----
+
+
+(defn atom-call-count
+  "Return a thread-safe function (using atom) that manipulates call counts as follows:
+  Argument Description
+  none     returns current count
+  :reset   resets the current counts to 0
+  :count   updates the counter"
+  []
+  (let [stats (atom 0)]
+    (fn
+      ([] (deref stats))
+      ([k] (if (identical? :reset k)
+             (reset! stats 0)
+             (swap! stats unchecked-inc))))))
+
+
+(defn transient-call-count
+  "Return a fast but non thread-safe function (using transient) that manipulates call counts as follows:
+  Argument Description
+  none     returns current count
+  :reset   resets the current counts to 0
+  :count   updates the counter"
+  []
+  (let [stats (transient [0])]
+    (fn
+      ([] (first (persistent! stats)))
+      ([k] (if (identical? :reset k)
+             (assoc! stats 0 0)
+             (assoc! stats 0 (unchecked-inc (long (get stats 0)))))))))
+
+
+(defn wrap-call-stats
+  "Given a function f wrap it using function stats (with side effects) to record invocation stats."
+  [stats f]
+  (fn [& args]
+    (try
+      (let [result (apply f args)]
+        (stats :count)
+        result))))
+
+
+(defn wait-until-millis
+  "Wait until specified time in milliseconds, showing progress."
+  ([^long timeout-millis]
+    (wait-until-millis timeout-millis 100))
+  ([^long timeout-millis ^long progress-millis]
+    (while (< (System/currentTimeMillis) timeout-millis)
+      (let [millis (min progress-millis (- timeout-millis (System/currentTimeMillis)))]
+        (when (pos? millis)
+          (try
+            (Thread/sleep millis)
+            (catch InterruptedException e
+              (.interrupt ^Thread (Thread/currentThread))))
+          (print \.)
+          (flush))))))
+
+
+(defn benchmark-throughput*
+  "Run throughput benchmark and return result map."
+  [^long concurrency ^long warmup-millis ^long bench-millis f]
+  (let [exit?      (atom false)
+        stats-coll (repeatedly concurrency transient-call-count)
+        g-coll     (->> (repeat f)
+                     (map wrap-call-stats stats-coll)
+                     (map-indexed (fn [i g]
+                                    (fn []
+                                      (let [r (nth stats-coll i)]
+                                        (while (not (deref exit?))
+                                          (g))
+                                        (r)))))
+                     vec)
+        call-count (->> (fn [future-vals]
+                          (print "\nWarming up")
+                          (wait-until-millis (+ (System/currentTimeMillis) warmup-millis))
+                          (mapv #(% :reset) stats-coll) ; reset counters
+                          (print "\nBenchmarking")
+                          (wait-until-millis (+ (System/currentTimeMillis) bench-millis))
+                          (println)
+                          (swap! exit? not)
+                          (mapv deref future-vals))
+                     (concurrently concurrency g-coll)
+                     (apply +))]
+    {:concurrency concurrency
+     :calls-count call-count
+     :duration-millis bench-millis
+     :calls-per-second (->> (/ bench-millis 1000)
+                         double
+                         (/ ^long call-count)
+                         long)}))
+
+
+(defmacro benchmark-throughput
+  "Benchmark a body of code for throughput."
+  [concurrency warmup-millis bench-millis & body]
+  `(benchmark-throughput* ~concurrency ~warmup-millis ~bench-millis (fn [] ~@body)))

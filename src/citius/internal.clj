@@ -271,7 +271,7 @@
 ;; ----- call stats helpers -----
 
 
-(defn atom-call-count
+(defn call-count
   "Return a thread-safe function (using atom) that manipulates call counts as follows:
   Argument Description
   none     returns current count
@@ -284,21 +284,6 @@
       ([k] (if (identical? :reset k)
              (reset! stats 0)
              (swap! stats unchecked-inc))))))
-
-
-(defn transient-call-count
-  "Return a fast but non thread-safe function (using transient) that manipulates call counts as follows:
-  Argument Description
-  none     returns current count
-  :reset   resets the current counts to 0
-  :count   updates the counter"
-  []
-  (let [stats (transient [0])]
-    (fn
-      ([] (first (persistent! stats)))
-      ([k] (if (identical? :reset k)
-             (assoc! stats 0 0)
-             (assoc! stats 0 (unchecked-inc (long (get stats 0)))))))))
 
 
 (defn wrap-call-stats
@@ -331,7 +316,7 @@
   "Run throughput benchmark and return result map."
   [^long concurrency ^long warmup-millis ^long bench-millis f]
   (let [exit?      (atom false)
-        stats-coll (repeatedly concurrency transient-call-count)
+        stats-coll (repeatedly concurrency call-count)
         g-coll     (->> (repeat f)
                      (map wrap-call-stats stats-coll)
                      (map-indexed (fn [i g]

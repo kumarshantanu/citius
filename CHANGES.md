@@ -1,6 +1,11 @@
 ## Changes and TODO
 
 
+## 2015-August-06 / 0.2.2
+
+* Handle merging of arrays in concurrent benchmark results
+
+
 ## 2015-June-29 / 0.2.1
 
 * Show extrapolated throughput in comparative benchmark output

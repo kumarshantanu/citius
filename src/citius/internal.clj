@@ -154,23 +154,27 @@
                           (unexpected "Integer, Long, Float or Double" x)))]
     (cond
       (apply = coll) v
-      (number? v) (-> (apply + coll)
-                    average)
-      (string? v) (if (apply = coll)
-                    v
-                    (s/join ", " coll))
-      (map? v)    (let [ks (->> (map keys coll)
-                             (map set)
-                             (apply t/union))]
-                    (->> (map (fn [k]
-                                {k (->> (map #(get % k) coll)
-                                     vec
-                                     cr-merge)}) ks)
-                      (apply merge)))
-      (coll? v)   (->> (apply map vector coll)
-                    (map cr-merge)
-                    as-coll)
-      :otherwise  (unexpected "number, string, map or collection" v))))
+      (number? v)    (-> (apply + coll)
+                       average)
+      (string? v)    (if (apply = coll)
+                       v
+                       (s/join ", " coll))
+      (map? v)       (let [ks (->> (map keys coll)
+                                (map set)
+                                (apply t/union))]
+                       (->> (map (fn [k]
+                                   {k (->> (map #(get % k) coll)
+                                        vec
+                                        cr-merge)}) ks)
+                         (apply merge)))
+      (coll? v)      (->> (apply map vector coll)
+                       (map cr-merge)
+                       as-coll)
+      (.isArray
+        (class v))   (->> (apply map vector coll)
+                       (map cr-merge)
+                       object-array)
+      :otherwise     (unexpected "number, string, map, collection or array" v))))
 
 
 (defmacro measure

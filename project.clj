@@ -3,7 +3,7 @@
   :url "https://github.com/kumarshantanu/citius"
   :license {:name "Eclipse Public License"
             :url "http://www.eclipse.org/legal/epl-v10.html"}
-  :dependencies [[criterium    "0.4.3" :exclusions [[org.clojure/clojure] [clojure-complete]]]
+  :dependencies [[criterium    "0.4.4"]
                  [cljfreechart "0.1.1"]
                  [myguidingstar/clansi "1.3.0" :exclusions [[org.clojure/clojure]]]]
   :global-vars {*warn-on-reflection* true

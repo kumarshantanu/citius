@@ -1,6 +1,12 @@
 ## Changes and TODO
 
 
+## 2016-May-?? / 0.2.3
+
+* Updated dependency version: Criterium `0.4.4`
+* [TODO] Given concurrency as a comma-separated integer string, repeat last integer indefinitely
+
+
 ## 2015-August-06 / 0.2.2
 
 * Handle merging of arrays in concurrent benchmark results

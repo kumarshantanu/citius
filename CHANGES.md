@@ -1,7 +1,7 @@
 ## Changes and TODO
 
 
-## 2016-May-?? / 0.2.3
+## 2016-May-20 / 0.2.3
 
 * Updated dependency version: Criterium `0.4.4`
 * Given option concurrency as a comma-separated integer string, repeat last integer indefinitely

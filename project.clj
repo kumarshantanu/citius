@@ -1,4 +1,4 @@
-(defproject citius "0.2.3-SNAPSHOT"
+(defproject citius "0.2.3"
   :description "Comparative benchmarking using Criterium"
   :url "https://github.com/kumarshantanu/citius"
   :license {:name "Eclipse Public License"

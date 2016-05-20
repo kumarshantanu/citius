@@ -6,7 +6,7 @@ A Clojure library for comparative benchmarking using
 
 ## Usage
 
-Leiningen dependency: `[citius "0.2.2"]`
+Leiningen dependency: `[citius "0.2.3"]`
 
 Requiring namespace:
 ```clojure
@@ -66,19 +66,19 @@ On Unix-like systems:
 CITIUS_CRITERIUM_OUTPUT=true lein with-profile clj17,bench test
 # or
 export CITIUS_CRITERIUM_OUTPUT=true
-lein with-profile clj17,bench test
+lein with-profile clj18,bench test
 ```
 
 On Windows:
 ```batch
 set CITIUS_CRITERIUM_OUTPUT=true
-lein with-profile clj17,bench test
+lein with-profile clj18,bench test
 ```
 
 
 ## License
 
-Copyright © 2015 Shantanu Kumar (kumar.shantanu@gmail.com, shantanu.kumar@concur.com)
+Copyright © 2015-2016 Shantanu Kumar (kumar.shantanu@gmail.com, shantanu.kumar@concur.com)
 
 Distributed under the Eclipse Public License either version 1.0 or (at
 your option) any later version.

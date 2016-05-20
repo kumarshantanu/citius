@@ -71,15 +71,21 @@
   []
   (if (contains? *options* :concurrency)
     (get *options* :concurrency)
-    (if-let [^String concurrency-prop (System/getProperty "citius_concurrency")]
-      (->> (s/split concurrency-prop #",")
-        (mapv s/trim)
-        (mapv #(Integer/parseInt ^String %)))
-      (if-let [^String concurrency-env (System/getenv "CITIUS_CONCURRENCY")]
-        (->> (s/split concurrency-env #",")
-          (mapv s/trim)
-          (mapv #(Integer/parseInt ^String %)))
-        (repeat 1)))))
+    (let [num-seq (fn [^String comma-sep-nums]
+                    (->> (s/split comma-sep-nums #",")
+                      (mapv s/trim)
+                      (mapv #(Integer/parseInt ^String %))
+                      reverse
+                      (reduce (fn [nums n]
+                                (if (nil? nums)
+                                  (repeat n)
+                                  (cons n nums)))
+                        nil)))]
+      (if-let [^String concurrency-prop (System/getProperty "citius_concurrency")]
+        (num-seq concurrency-prop)
+        (if-let [^String concurrency-env (System/getenv "CITIUS_CONCURRENCY")]
+          (num-seq concurrency-env)
+          (repeat 1))))))
 
 
 (def time-unit-factors

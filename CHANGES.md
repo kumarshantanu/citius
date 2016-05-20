@@ -4,7 +4,8 @@
 ## 2016-May-?? / 0.2.3
 
 * Updated dependency version: Criterium `0.4.4`
-* [TODO] Given concurrency as a comma-separated integer string, repeat last integer indefinitely
+* Given option concurrency as a comma-separated integer string, repeat last integer indefinitely
+  * Impacts system property `citius_concurrency` and environment variable `CITIUS_CONCURRENCY`
 
 
 ## 2015-August-06 / 0.2.2

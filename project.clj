@@ -9,10 +9,13 @@
   :global-vars {*warn-on-reflection* true
                 *assert* true}
   :jvm-opts ^:replace ["-server" "-Xms2048m" "-Xmx2048m"]
-  :profiles {:c16 {:dependencies [[org.clojure/clojure "1.6.0"]]}
+  :profiles {:provided {:dependencies [[org.clojure/clojure "1.6.0"]]}
+             :c16 {:dependencies [[org.clojure/clojure "1.6.0"]]}
              :c17 {:dependencies [[org.clojure/clojure "1.7.0"]]
                    :global-vars {*unchecked-math* :warn-on-boxed}}
              :c18 {:dependencies [[org.clojure/clojure "1.8.0"]]
                    :global-vars {*unchecked-math* :warn-on-boxed}}
-             :dev {:dependencies [[org.clojure/tools.nrepl "0.2.10"]]}
+             :c19 {:dependencies [[org.clojure/clojure "1.9.0-alpha14"]]
+                   :global-vars {*unchecked-math* :warn-on-boxed}}
+             :dln {:jvm-opts ["-Dclojure.compiler.direct-linking=true"]}
              :pro {:global-vars {*assert* false}}})

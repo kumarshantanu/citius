@@ -1,6 +1,17 @@
 ## Changes and TODO
 
 
+## TODO
+
+* [TODO] Export stats data as EDN
+* [TODO] Fix occasional negative latency under high concurrency
+
+
+## 2016-December-?? / 0.2.4
+
+* Show usage about system properties/environment variables on first namespace load
+
+
 ## 2016-May-20 / 0.2.3
 
 * Updated dependency version: Criterium `0.4.4`

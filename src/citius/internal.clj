@@ -9,6 +9,7 @@
 
 (ns citius.internal
   (:require
+    [clojure.pprint :as pp]
     [clojure.set    :as t]
     [clojure.string :as s]
     [clansi.core    :as a]
@@ -29,6 +30,44 @@
 (defn echo
   [& args]
   (apply println "\n[citius] " args))
+
+
+(when (if-let [^String criterium-verbose-prop (System/getProperty "citius_verbose_usage")]
+        (Boolean/parseBoolean criterium-verbose-prop)
+        (if-let [^String criterium-verbose-env (System/getenv "CITIUS_VERBOSE_USAGE")]
+          (Boolean/parseBoolean criterium-verbose-env)
+          true))
+  (echo "You can control benchmarking behavior with following system properties/environment variables:")
+  (pp/print-table [:description
+                   :java-system-property
+                   :environment-variable
+                   :values
+                   :default]
+    [{:description "Whether to show this usage table"
+      :java-system-property "citius_verbose_usage"
+      :environment-variable "CITIUS_VERBOSE_USAGE"
+      :values "true | false"
+      :default true}
+     {:description "Enable/disable output colorization"
+      :java-system-property "citius_colorize"
+      :environment-variable "CITIUS_COLORIZE"
+      :values "true | false"
+      :default true}
+     {:description "Toggle Criterium benchmark output"
+      :java-system-property "citius_criterium_output"
+      :environment-variable "CITIUS_CRITERIUM_OUTPUT"
+      :values "true | false"
+      :default :tabular}
+     {:description "Run benchmarks in a quick mode"
+      :java-system-property "citius_quick_bench"
+      :environment-variable "CITIUS_QUICK_BENCH"
+      :values "true | false"
+      :default false}
+     {:description "Concurrency for running benchmarks"
+      :java-system-property "citius_concurrency"
+      :environment-variable "CITIUS_CONCURRENCY"
+      :values "integer (CSV)"
+      :default 1}]))
 
 
 ;; ----- options -----

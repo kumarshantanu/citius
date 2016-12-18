@@ -7,7 +7,7 @@
 * [TODO] Fix occasional negative latency under high concurrency
 
 
-## 2016-December-?? / 0.2.4
+## 2016-December-18 / 0.2.4
 
 * Show usage about system properties/environment variables on first namespace load
 
